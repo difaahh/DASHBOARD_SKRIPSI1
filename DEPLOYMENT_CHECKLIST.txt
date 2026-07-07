@@ -1,0 +1,60 @@
+# ================================================
+# STREAMLIT DEPLOYMENT CHECKLIST
+# ================================================
+# Pastikan semua file di bawah ini ADA di repository GitHub
+# sebelum deploy ke Streamlit Cloud
+# ================================================
+
+# 📁 ROOT FOLDER (Wajib)
+✅ Dashboard.py              # Halaman utama
+✅ requirements.txt         # Dependency Python
+✅ preprocessing.py          # Fungsi preprocessing LDA
+✅ preprop_mber.py          # Fungsi preprocessing mBERT
+
+# 📁 FOLDER: .streamlit/ (Wajib)
+✅ .streamlit/config.toml   # Konfigurasi Streamlit
+
+# 📁 FOLDER: pages/ (Wajib)
+✅ pages/LDA.py              # Halaman hasil LDA
+✅ pages/mBERT.py            # Halaman hasil mBERT
+✅ pages/Analisis Tweet.py   # Halaman analisis tweet
+
+# 📁 FOLDER: assets/ (Wajib - SEMUA GAMBAR)
+✅ assets/icon_lda.png
+✅ assets/icon_mbert.png
+✅ assets/tweet.png
+✅ assets/Info_data.png
+✅ assets/logo_jne.png
+✅ assets/logo_jnt.png
+✅ assets/logo_sicepat.png
+✅ assets/logo_anteraja.png
+✅ assets/wordcloud_0.png
+✅ assets/wordcloud_1.png
+✅ assets/wordcloud_2.png
+✅ assets/wordcloud_4.png
+✅ assets/pyLDAvis_LDA-BoW-NoStem.html
+✅ assets/pyLDAvis_LDA-BoW-Stem.html
+✅ assets/pyLDAvis_LDA-TFIDF-NoStem.html
+✅ assets/pyLDAvis_LDA-TFIDF-Stem.html
+
+# 📁 FOLDER: data/OUTPUT_LDA/ (Wajib)
+✅ data/OUTPUT_LDA/LDA_Output_Lengkap.xlsx
+✅ data/OUTPUT_LDA/data_bersih.xlsx
+✅ data/OUTPUT_LDA/topword.xlsx
+✅ data/OUTPUT_LDA/dict_bow.dict
+✅ data/OUTPUT_LDA/dict_tfidf.dict
+✅ data/OUTPUT_LDA/lda_bow_best.pkl
+✅ data/OUTPUT_LDA/lda_tfidf_best.pkl
+
+# 📁 FOLDER: data/OUTPUT_MBERT/ (Wajib)
+✅ data/OUTPUT_MBERT/07_cluster_final.xlsx
+✅ data/OUTPUT_MBERT/09A_ctfidf_semua.xlsx
+✅ data/OUTPUT_MBERT/umap_final.pkl
+✅ data/OUTPUT_MBERT/kmeans_final.pkl
+
+# ================================================
+# JIKA ERROR SETELAH DEPLOY, CEK:
+# 1. Apakah semua file di atas ada di GitHub?
+# 2. Apakah nama folder/file SAMA PERSIS (case-sensitive)?
+# 3. Buka Streamlit Cloud > App > Logs untuk lihat error
+# ================================================
