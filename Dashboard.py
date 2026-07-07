@@ -432,7 +432,7 @@ with right:
     with st.container(border=True):
         st.markdown("### 📈 Statistik Data Setelah Preprocessing")
 
-        st.image("assets/info_data.png")
+        st.image("assets/Info_data.png")
 
 #### infoo ekspedisii
 st.write("")
