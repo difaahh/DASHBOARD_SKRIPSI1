@@ -466,29 +466,19 @@ def predict_mbert(tweet):
         st.error("Tweet tidak dapat diproses.")
         return
 
-# ============================================
+# ==========================================================
 # EMBEDDING
 # ============================================
     embedding = encoder.encode(
         [teks],
         convert_to_numpy=True
-    ).flatten()
+    )
 
     # ============================================
-    # PREDIKSI CLUSTER menggunakan jarak ke centroid
-    # KMeans centroid ada di ruang 2D (UMAP), jadi kita
-    # pakai jarak Euclidean langsung
+    # PREDIKSI CLUSTER
+    # KMeans sudah di-train di 768D, langsung predict
     # ============================================
-    centroids = kmeans_model.cluster_centers_
-
-    # Hitung jarak ke setiap centroid
-    distances = [
-        np.sqrt(np.sum((embedding[:len(c)] - c) ** 2))
-        for c in centroids
-    ]
-
-    # Pilih cluster dengan jarak terkecil
-    cluster = int(np.argmin(distances))
+    cluster = int(kmeans_model.predict(embedding)[0])
 
     # ============================================
     # Analisis kata input terhadap Top Words Cluster
