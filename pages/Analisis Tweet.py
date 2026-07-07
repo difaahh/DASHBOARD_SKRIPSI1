@@ -122,22 +122,7 @@ def load_models():
     # --------------------------
     encoder=SentenceTransformer( "paraphrase-multilingual-mpnet-base-v2")
 
-    # Load UMAP model - use parameter to avoid JIT issues
-    import umap
-    with open(
-        "data/OUTPUT_MBERT/umap_final.pkl",
-        "rb"
-    ) as f:
-        umap_model=pickle.load(f)
-
-    # Override UMAP to avoid JIT compilation issues
-    umap_model._a = None
-    umap_model._b = None
-    umap_model._search_graph = None
-    umap_model._rp_tree = None
-    umap_model._hashmap = None
-    umap_model._dist_func = None
-
+    # Load KMeans model (centroid di ruang 2D/UMAP)
     with open(
         "data/OUTPUT_MBERT/kmeans_final.pkl",
         "rb"
@@ -150,7 +135,6 @@ def load_models():
         dict_bow,
         dict_tfidf,
         encoder,
-        umap_model,
         kmeans_model
     )
 
@@ -195,7 +179,6 @@ def load_data():
     dict_bow,
     dict_tfidf,
     encoder,
-    umap_model,
     kmeans_model
 )=load_models()
 
@@ -489,25 +472,23 @@ def predict_mbert(tweet):
     embedding = encoder.encode(
         [teks],
         convert_to_numpy=True
-    )
-
-    # Samakan dengan proses training
-    embedding = normalize(embedding)
-
-    # Transform ke ruang UMAP
-    embedding_umap = umap_model.transform(
-        embedding
-    )
+    ).flatten()
 
     # ============================================
-    # PREDIKSI CLUSTER
+    # PREDIKSI CLUSTER menggunakan jarak ke centroid
+    # KMeans centroid ada di ruang 2D (UMAP), jadi kita
+    # pakai jarak Euclidean langsung
     # ============================================
-    cluster = int(
-        kmeans_model.predict(
-            embedding_umap
-        )[0]
+    centroids = kmeans_model.cluster_centers_
 
-    )
+    # Hitung jarak ke setiap centroid
+    distances = [
+        np.sqrt(np.sum((embedding[:len(c)] - c) ** 2))
+        for c in centroids
+    ]
+
+    # Pilih cluster dengan jarak terkecil
+    cluster = int(np.argmin(distances))
 
     # ============================================
     # Analisis kata input terhadap Top Words Cluster
