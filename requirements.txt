@@ -8,8 +8,10 @@ plotly>=5.18.0
 gensim>=4.3.0
 Sastrawi>=1.0.1
 
-# mBERT / Sentence Transformers
+# mBERT / Sentence Transformers (with CPU torch)
 sentence-transformers>=2.2.0
+torch>=2.0.0
+torchvision>=0.15.0
 scikit-learn>=1.3.0
 umap-learn>=0.5.0
 
