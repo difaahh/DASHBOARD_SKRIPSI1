@@ -1,3 +1,12 @@
 [client]
 showSidebarNavigation = false
 
+[server]
+headless = true
+
+[runner]
+magicEnabled = true
+
+# Environment variables for Numba compatibility
+[serverEnvironment]
+NUMBA_DISABLE_JIT = "1"

@@ -3,6 +3,10 @@
 # ==========================================================
 # IMPORT LIBRARY
 # ==========================================================
+# Disable Numba JIT for Streamlit Cloud compatibility
+import os
+os.environ['NUMBA_DISABLE_JIT'] = '1'
+
 # Library utama Streamlit
 import streamlit as st
 import pandas as pd
@@ -118,17 +122,17 @@ def load_models():
     # --------------------------
     encoder=SentenceTransformer( "paraphrase-multilingual-mpnet-base-v2")
 
-    with open(
-        "data/OUTPUT_MBERT/umap_final.pkl",
-        "rb"
-    ) as f:
-        umap_model=pickle.load(f)
-
+    # Load KMeans model
     with open(
         "data/OUTPUT_MBERT/kmeans_final.pkl",
         "rb"
     ) as f:
         kmeans_model=pickle.load(f)
+
+    # Load cluster data untuk mendapatkan centroid
+    cluster_df = pd.read_excel(
+        "data/OUTPUT_MBERT/07_cluster_final.xlsx"
+    )
 
     return (
         lda_bow,
@@ -136,8 +140,8 @@ def load_models():
         dict_bow,
         dict_tfidf,
         encoder,
-        umap_model,
-        kmeans_model
+        kmeans_model,
+        cluster_df
     )
 
 
@@ -181,8 +185,8 @@ def load_data():
     dict_bow,
     dict_tfidf,
     encoder,
-    umap_model,
-    kmeans_model
+    kmeans_model,
+    mbert_cluster_df
 )=load_models()
 
 (
@@ -475,32 +479,20 @@ def predict_mbert(tweet):
     embedding = encoder.encode(
         [teks],
         convert_to_numpy=True
-    )
-
-    # Samakan dengan proses training
-    embedding = normalize(embedding)
-
-    embedding_umap = umap_model.transform(
-        embedding
-    )
-
-    # print("Embedding :", embedding.shape)
-    # print("UMAP :", embedding_umap.shape)
-    # print("KMeans :", kmeans_model.cluster_centers_.shape)
-    # print("UMAP components :", umap_model.n_components)
-    # st.stop()   # hentikan dulu di sini
-
-
+    ).flatten()
 
     # ============================================
-    # PREDIKSI CLUSTER
+    # PREDIKSI CLUSTER menggunakan jarak ke centroid
     # ============================================
-    cluster = int(
-        kmeans_model.predict(
-            embedding_umap
-        )[0]
+    # Hitung jarak ke setiap centroid cluster
+    distances = []
+    for i in range(len(kmeans_model.cluster_centers_)):
+        centroid = kmeans_model.cluster_centers_[i]
+        dist = np.linalg.norm(embedding - centroid)
+        distances.append(dist)
 
-    )
+    # Pilih cluster dengan jarak terkecil
+    cluster = int(np.argmin(distances))
 
     # ============================================
     # Analisis kata input terhadap Top Words Cluster
