@@ -118,9 +118,9 @@ def load_models():
     )
 
     # --------------------------
-    # mBERT
+    # mBERT - MiniLM lebih ringan untuk Streamlit Cloud
     # --------------------------
-    encoder=SentenceTransformer( "paraphrase-multilingual-mpnet-base-v2")
+    encoder=SentenceTransformer( "paraphrase-multilingual-MiniLM-L12-v2")
 
     # Load KMeans model (centroid di ruang 2D/UMAP)
     with open(
