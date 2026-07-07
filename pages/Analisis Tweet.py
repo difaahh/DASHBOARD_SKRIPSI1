@@ -122,17 +122,27 @@ def load_models():
     # --------------------------
     encoder=SentenceTransformer( "paraphrase-multilingual-mpnet-base-v2")
 
-    # Load KMeans model
+    # Load UMAP model - use parameter to avoid JIT issues
+    import umap
+    with open(
+        "data/OUTPUT_MBERT/umap_final.pkl",
+        "rb"
+    ) as f:
+        umap_model=pickle.load(f)
+
+    # Override UMAP to avoid JIT compilation issues
+    umap_model._a = None
+    umap_model._b = None
+    umap_model._search_graph = None
+    umap_model._rp_tree = None
+    umap_model._hashmap = None
+    umap_model._dist_func = None
+
     with open(
         "data/OUTPUT_MBERT/kmeans_final.pkl",
         "rb"
     ) as f:
         kmeans_model=pickle.load(f)
-
-    # Load cluster data untuk mendapatkan centroid
-    cluster_df = pd.read_excel(
-        "data/OUTPUT_MBERT/07_cluster_final.xlsx"
-    )
 
     return (
         lda_bow,
@@ -140,8 +150,8 @@ def load_models():
         dict_bow,
         dict_tfidf,
         encoder,
-        kmeans_model,
-        cluster_df
+        umap_model,
+        kmeans_model
     )
 
 
@@ -185,8 +195,8 @@ def load_data():
     dict_bow,
     dict_tfidf,
     encoder,
-    kmeans_model,
-    mbert_cluster_df
+    umap_model,
+    kmeans_model
 )=load_models()
 
 (
@@ -479,20 +489,25 @@ def predict_mbert(tweet):
     embedding = encoder.encode(
         [teks],
         convert_to_numpy=True
-    ).flatten()
+    )
+
+    # Samakan dengan proses training
+    embedding = normalize(embedding)
+
+    # Transform ke ruang UMAP
+    embedding_umap = umap_model.transform(
+        embedding
+    )
 
     # ============================================
-    # PREDIKSI CLUSTER menggunakan jarak ke centroid
+    # PREDIKSI CLUSTER
     # ============================================
-    # Hitung jarak ke setiap centroid cluster
-    distances = []
-    for i in range(len(kmeans_model.cluster_centers_)):
-        centroid = kmeans_model.cluster_centers_[i]
-        dist = np.linalg.norm(embedding - centroid)
-        distances.append(dist)
+    cluster = int(
+        kmeans_model.predict(
+            embedding_umap
+        )[0]
 
-    # Pilih cluster dengan jarak terkecil
-    cluster = int(np.argmin(distances))
+    )
 
     # ============================================
     # Analisis kata input terhadap Top Words Cluster
